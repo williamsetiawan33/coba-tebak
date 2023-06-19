@@ -2,8 +2,8 @@
 This repository contains an API for coba-tebak word game.
 
 Instruction / Instruksi instalasi :
-1. install lampp (linux) atau xampp di windows, kemudian jalankan xamppnya.
-2. import file sql yang ada di repo williamsetiawan33.github.io ke db mysql dengan nama coba-tebak di phpmyadmin.
+1. install lampp (linux) atau xampp di windows, kemudian jalankan xampp-nya.
+2. import file sql yang ada di repo williamsetiawan33.github.io ke db mysql dengan nama db coba-tebak di phpmyadmin.
 3. fork dan clone repo ini di folder htdocs xampp / lampp.
 4. Instruksi selanjutnya untuk tugas backend menunggu kordinasi.
 
