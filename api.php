@@ -49,17 +49,15 @@ if (isset($_GET["req"])) {
 
 
             echo ($result);
-        } else if ($_GET["question"] != "all" && !is_numeric($_GET["question"])) {
-            echo "wrong question request format";
         } else {
-            $query = mysqli_query($conn, 'SELECT * FROM questions WHERE questionId = ' . $_GET["question"]);
+            $query = mysqli_query($conn, 'SELECT * FROM questions WHERE questionId = ' . '"' . $_GET["question"] . '"');
             $result = [];
             $row = mysqli_fetch_assoc($query);
             $result[] = $row;
             mysqli_close($conn);
 
             if ($result[0] == null) {
-                echo "no data with the given questionId";
+                echo '{"message":"no data"}';
             } else {
                 $result = json_encode($result);
                 echo ($result);
@@ -80,13 +78,13 @@ if (isset($_GET["req"])) {
 
             echo ($result);
         } else {
-            echo "wrong question request format";
+            echo '{"message":"wrong request format"}';
         }
     }
     // if a request is a specific question that is contributed by a player
     else if ($_GET["req"] == "questionPlayer") {
-        if (isset($_GET["player"]) && is_numeric($_GET["player"])) {
-            $query = mysqli_query($conn, "SELECT * FROM questions WHERE playerId = " . $_GET["player"]);
+        if (isset($_GET["player"])) {
+            $query = mysqli_query($conn, "SELECT * FROM questions WHERE playerId = " . '"' . $_GET["player"] . '"');
             $result = [];
             while ($row = mysqli_fetch_assoc($query)) {
                 $result[] = $row;
@@ -95,21 +93,24 @@ if (isset($_GET["req"])) {
 
             $result = json_encode($result);
 
-
-            echo ($result);
+            if ($result == "[]") {
+                echo '{"message":"no data"}';
+            } else {
+                echo ($result);
+            }
         } else {
-            echo "wrong question request format";
+            echo '{"message":"wrong request format"}';
         }
     } else if ($_GET["req"] == "playerInfo") {
-        if (isset($_GET["player"]) && is_numeric($_GET["player"])) {
-            $query = mysqli_query($conn, "SELECT playerId, playerName,levelOneScore, levelTwoScore, levelThreeScore FROM players WHERE playerId = " . $_GET["player"]);
+        if (isset($_GET["player"])) {
+            $query = mysqli_query($conn, "SELECT playerId, playerName,levelOneScore, levelTwoScore, levelThreeScore FROM players WHERE playerId = " . '"' . $_GET["player"] . '"');
             $result = [];
             $row = mysqli_fetch_assoc($query);
             $result[] = $row;
             mysqli_close($conn);
 
             if ($result[0] == null) {
-                echo "no data with the given playerId";
+                echo '{"message":"no data"}';
             } else {
                 $result = json_encode($result);
 
@@ -117,7 +118,7 @@ if (isset($_GET["req"])) {
                 echo ($result);
             }
         } else {
-            echo "wrong question request format";
+            echo '{"message":"wrong request format"}';
         }
     }
     // if a request is a rank for the main menu, per part and per level
@@ -137,7 +138,7 @@ if (isset($_GET["req"])) {
             mysqli_close($conn);
 
             if ($result[0] == null) {
-                echo "no data with the given playerId";
+                echo '{"message":"no data"}';
             } else {
                 $result = json_encode($result);
 
@@ -145,13 +146,13 @@ if (isset($_GET["req"])) {
                 echo ($result);
             }
         } else {
-            echo "wrong question request format";
+            echo '{"message":"wrong request format"}';
         }
     } else {
-        echo "wrong question request format";
+        echo '{"message":"wrong request format"}';
     }
 } else {
-    echo "<p>welcome to cobak tebak API. Please refer to documentation for information about how to use this api.</p>";
+    echo '{"message":"welcome to cobak tebak API. Please refer to documentation for information about how to use this api."}';
 }
 
 if (isset($_POST['upload'])) {
