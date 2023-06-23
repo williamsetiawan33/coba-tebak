@@ -74,9 +74,13 @@ if (isset($_GET["req"])) {
             }
             mysqli_close($conn);
 
-            $result = json_encode($result);
+            if ($result[0] == null) {
+                echo '{"message":"no data"}';
+            } else {
+                $result = json_encode($result);
 
-            echo ($result);
+                echo ($result);
+            }
         } else {
             echo '{"message":"wrong request format"}';
         }
@@ -91,11 +95,13 @@ if (isset($_GET["req"])) {
             }
             mysqli_close($conn);
 
-            $result = json_encode($result);
 
-            if ($result == "[]") {
+            if ($result[0] == null) {
+                // var_dump($result);
                 echo '{"message":"no data"}';
             } else {
+                // var_dump($result);
+                $result = json_encode($result);
                 echo ($result);
             }
         } else {
@@ -110,8 +116,10 @@ if (isset($_GET["req"])) {
             mysqli_close($conn);
 
             if ($result[0] == null) {
+                // var_dump($result);
                 echo '{"message":"no data"}';
             } else {
+                // var_dump($result);
                 $result = json_encode($result);
 
 
@@ -123,23 +131,81 @@ if (isset($_GET["req"])) {
     }
     // if a request is a rank for the main menu, per part and per level
     else if ($_GET["req"] == "playerRank") {
-        if ((isset($_GET["level"]) && is_numeric($_GET["level"])) && isset($_GET["listPoss"]) && is_numeric($_GET["listPoss"])) {
-            if ($_GET["level"] == 1) {
-                $query = mysqli_query($conn, "SELECT playerName, levelOneScore FROM players WHERE levelOneScore != 0 ORDER BY levelOneScore DESC " . "LIMIT " . $_GET["listPoss"] - 1 . ", " . "50");
-            } else if ($_GET["level"] == 2) {
-                $query = mysqli_query($conn, "SELECT playerName, levelOneScore FROM players WHERE levelTwoScore != 0 ORDER BY levelTwoScore DESC");
-            } else if ($_GET["level"] == 3) {
-                $query = mysqli_query($conn, "SELECT playerName, levelOneScore FROM players WHERE levelThreeScore != 0 ORDER BY levelThreeScore DESC");
-            }
+        if ((isset($_GET["level"]) && is_numeric($_GET["level"])) && isset($_GET["rank"])) {
             $result = [];
-            while ($row = mysqli_fetch_assoc($query)) {
-                $result[] = $row;
+            if ($_GET["rank"] == "all50") {
+                if ($_GET["level"] == 1) {
+                    $query = mysqli_query($conn, "SELECT * FROM (SELECT playerName, levelOneScore, row_number() OVER (ORDER BY levelOneScore DESC) AS rank FROM players) t WHERE rank BETWEEN 1 AND 50");
+                    while ($row = mysqli_fetch_assoc($query)) {
+                        $result[] = $row;
+                    }
+                } else if ($_GET["level"] == 2) {
+                    $query = mysqli_query($conn, "SELECT * FROM (SELECT playerName, levelTwoScore, row_number() OVER (ORDER BY levelTwoScore DESC) AS rank FROM players) t WHERE rank BETWEEN 1 AND 50");
+                    while ($row = mysqli_fetch_assoc($query)) {
+                        $result[] = $row;
+                    }
+                } else if ($_GET["level"] == 3) {
+                    $query = mysqli_query($conn, "SELECT * FROM (SELECT playerName, levelThreeScore, row_number() OVER (ORDER BY levelThreeScore DESC) AS rank FROM players) t WHERE rank BETWEEN 1 AND 50");
+                    while ($row = mysqli_fetch_assoc($query)) {
+                        $result[] = $row;
+                    }
+                } else {
+                    $result[0] = null;
+                }
+            } else {
+                if ($_GET["level"] == 1) {
+                    $query = mysqli_query($conn, "SELECT rank FROM (SELECT playerId, levelOneScore, row_number() OVER (ORDER BY levelOneScore DESC) AS rank FROM players) t WHERE playerId = " . '"' . $_GET["rank"] . '"');
+                    $row = mysqli_fetch_assoc($query);
+                    $result[] = $row;
+                } else if ($_GET["level"] == 2) {
+                    $query = mysqli_query($conn, "SELECT rank FROM (SELECT playerId, levelTwoScore, row_number() OVER (ORDER BY levelTwoScore DESC) AS rank FROM players) t WHERE playerId = " . '"' . $_GET["rank"] . '"');
+                    $row = mysqli_fetch_assoc($query);
+                    $result[] = $row;
+                } else if ($_GET["level"] == 3) {
+                    $query = mysqli_query($conn, "SELECT rank FROM (SELECT playerId, levelThreeScore, row_number() OVER (ORDER BY levelThreeScore DESC) AS rank FROM players) t WHERE playerId = " . '"' . $_GET["rank"] . '"');
+                    $row = mysqli_fetch_assoc($query);
+                    $result[] = $row;
+                } else {
+                    $result[0] = null;
+                }
             }
             mysqli_close($conn);
 
             if ($result[0] == null) {
                 echo '{"message":"no data"}';
             } else {
+                $result = json_encode($result);
+
+
+                echo ($result);
+            }
+        } else {
+            echo '{"message":"wrong request format"}';
+        }
+    } else if ($_GET["req"] == "playerCount") {
+        if (isset($_GET["level"]) && is_numeric($_GET["level"])) {
+            $result = [];
+            if ($_GET["level"] == 1) {
+                $query = mysqli_query($conn, "SELECT COUNT(rank) as amount FROM (SELECT playerId, PlayerName, row_number() OVER (ORDER BY levelOneScore DESC) AS rank FROM players) t");
+                $row = mysqli_fetch_assoc($query);
+                $result[] = $row;
+            } else if ($_GET["level"] == 2) {
+                $query = mysqli_query($conn, "SELECT COUNT(rank) as amount FROM (SELECT playerId, PlayerName, row_number() OVER (ORDER BY levelTwoScore DESC) AS rank FROM players) t");
+                $row = mysqli_fetch_assoc($query);
+                $result[] = $row;
+            } else if ($_GET["level"] == 3) {
+                $query = mysqli_query($conn, "SELECT COUNT(rank) as amount FROM (SELECT playerId, PlayerName, row_number() OVER (ORDER BY levelThreeScore DESC) AS rank FROM players) t");
+                $row = mysqli_fetch_assoc($query);
+                $result[] = $row;
+            } else {
+                $result[0] = null;
+            }
+            mysqli_close($conn);
+
+            if ($result[0] == null) {
+                echo '{"message":"no data"}';
+            } else {
+                // var_dump($result);
                 $result = json_encode($result);
 
 
