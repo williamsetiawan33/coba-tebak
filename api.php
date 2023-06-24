@@ -225,7 +225,7 @@ if (isset($_GET["req"])) {
 
 // if a request is a login request
 if (isset($_POST["submit"])) {
-    $query = mysqli_query($conn, "SELECT playerId, playerName FROM players WHERE playerName = " . '"' . $_POST["name"] . '"' . " AND playerAccessCode = " . '"' . $_POST["access"] . '"');
+    $query = mysqli_query($conn, "SELECT playerId, playerName, playerAccessCode FROM players WHERE playerName = " . '"' . $_POST["name"] . '"' . " AND playerAccessCode = " . '"' . $_POST["access"] . '"');
     $result = [];
     $row = mysqli_fetch_assoc($query);
     $result[] = $row;
