@@ -18,6 +18,8 @@
 header('Access-Control-Allow-Origin: *');
 // php response type
 header('Content-Type: application/json; charset=utf-8');
+// post header
+// header("Access-Control-Allow-Methods: POST");
 
 // api mode selection
 $mode = "dev";
@@ -217,13 +219,26 @@ if (isset($_GET["req"])) {
     } else {
         echo '{"message":"wrong request format"}';
     }
-} else {
-    echo '{"message":"welcome to cobak tebak API. Please refer to documentation for information about how to use this api."}';
-}
+} //else {
+//echo '{"message":"welcome to cobak tebak API. Please refer to documentation for information about how to use this api."}';
+//}
 
-if (isset($_POST['upload'])) {
-    if ($_POST["soal"] != "" && $_POST["jawaban"] != "" && $_POST["hint"] != "") {
-        mysqli_query($conn, 'INSERT INTO soal values' . '(' . 0 . ',' . '"' . $_POST["soal"] . '"' . ',' . '"' . $_POST["jawaban"] . '"' . ',' . '"' . $_POST["hint"] . '"' . ',' . '"Tim pengembang"' . ')');
-        echo "succes";
+// if a request is a login request
+if (isset($_POST["submit"])) {
+    $query = mysqli_query($conn, "SELECT playerId, playerName FROM players WHERE playerName = " . '"' . $_POST["name"] . '"' . " AND playerAccessCode = " . '"' . $_POST["access"] . '"');
+    $result = [];
+    $row = mysqli_fetch_assoc($query);
+    $result[] = $row;
+    mysqli_close($conn);
+
+    if ($result[0] == null) {
+        // var_dump($result);
+        echo '{"message":"no data"}';
+    } else {
+        // var_dump($result);
+        $result = json_encode($result);
+
+
+        echo ($result);
     }
 }
