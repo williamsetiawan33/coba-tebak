@@ -69,11 +69,15 @@ if (isset($_GET["req"])) {
     // if a request is a specific question from a level
     else if ($_GET["req"] == "questionLevel") {
         if (isset($_GET["level"]) && is_numeric($_GET["level"])) {
-            $query = mysqli_query($conn, "SELECT * FROM questions WHERE level = " . $_GET["level"]);
+            $query = mysqli_query($conn, "SELECT COUNT(question) as amount FROM (SELECT * FROM questions WHERE level = " . $_GET["level"] . ')t');
+            $amount = mysqli_fetch_assoc($query);
+            $randomQuestionNumber = rand(1, $amount["amount"]);
+            // echo $amount["amount"];
+            $query = mysqli_query($conn, "SELECT * FROM questions WHERE level = " . $_GET["level"] . " LIMIT " . $randomQuestionNumber - 1 . ', 1');
             $result = [];
-            while ($row = mysqli_fetch_assoc($query)) {
-                $result[] = $row;
-            }
+            $row = mysqli_fetch_assoc($query);
+            $result[] = $row;
+
             mysqli_close($conn);
 
             if ($result[0] == null) {
@@ -224,8 +228,8 @@ if (isset($_GET["req"])) {
 //}
 
 // if a request is a login request
-if (isset($_POST["submit"])) {
-    $query = mysqli_query($conn, "SELECT playerId, playerName, playerAccessCode FROM players WHERE playerName = " . '"' . $_POST["name"] . '"' . " AND playerAccessCode = " . '"' . $_POST["access"] . '"');
+if (isset($_POST["submit"]) && isset($_POST["name"]) && isset($_POST["access"])) {
+    $query = mysqli_query($conn, "SELECT * FROM players WHERE playerName = " . '"' . $_POST["name"] . '"' . " AND playerAccessCode = " . '"' . $_POST["access"] . '"');
     $result = [];
     $row = mysqli_fetch_assoc($query);
     $result[] = $row;
@@ -241,4 +245,71 @@ if (isset($_POST["submit"])) {
 
         echo ($result);
     }
+}
+
+// if a request is a signUp request
+if (isset($_POST["submit"]) && isset($_POST["name"]) && isset($_POST["signUp"])) {
+    $isExist = false;
+    $randomPlayerId = randomPlayerId();
+    $randomPlayerAccess = randomPlayerAccess();
+    // check user if exist on mysql database
+    $query = mysqli_query($conn, "SELECT * FROM players WHERE playerName = " . '"' . $_POST["name"] . '"');
+    $result = [];
+    $row = mysqli_fetch_assoc($query);
+    $result[] = $row;
+
+    // false if not exist, true if exist
+    if ($result[0] == null) {
+        // var_dump($result);
+        // echo 'username is not exist, proceed to insert algorithm';
+        $isExist = false;
+    } else {
+        // var_dump($result);
+        // $result = json_encode($result);
+
+
+        // echo ("username is exist, you can not proceed to insert algorithm");
+        $isExist = true;
+    }
+
+    // if true then insert into db and give succes message, if not then give already-used message
+    if ($isExist == false) {
+        $query = mysqli_query($conn, "INSERT INTO players VALUES(" . '"' . $randomPlayerId . '"' . ',' . '"' . $_POST["name"] . '"' . ',' . '"' . $randomPlayerAccess . '"' . ',0,0,0)');
+        mysqli_close($conn);
+        echo '{"message": "succes", "accessCode":' . '"' . $randomPlayerAccess . '"' . '}';
+    } else if ($isExist == true) {
+        echo '{"message": "already-used"}';
+    }
+    mysqli_close($conn);
+}
+
+
+function randomPlayerId()
+{
+    // algoritma random id
+
+    $n = 10;
+    $charArray = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
+    $randomPlayerId = "";
+
+    for ($i = 0; $i < $n; $i++) {
+        $index = rand(0, count($charArray) - 1);
+        $randomPlayerId .= $charArray[$index];
+    }
+    return $randomPlayerId;
+}
+
+function randomPlayerAccess()
+{
+    // algoritma random id
+
+    $n = 6;
+    $charArray = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
+    $randomPlayerAccess = "";
+
+    for ($i = 0; $i < $n; $i++) {
+        $index = rand(0, count($charArray) - 1);
+        $randomPlayerAccess .= $charArray[$index];
+    }
+    return $randomPlayerAccess;
 }
