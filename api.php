@@ -313,3 +313,18 @@ function randomPlayerAccess()
     }
     return $randomPlayerAccess;
 }
+
+
+// submit answer request
+if (isset($_POST["submitAnswer"]) && isset($_POST["playerId"]) && isset($_POST["score"]) && isset($_POST["level"])) {
+    if ($_POST["level"] == 1) {
+        mysqli_query($conn, "UPDATE players set levelOneScore = " . $_POST["score"] . " WHERE playerId = " . '"' . $_POST["playerId"] . '"');
+        mysqli_close($conn);
+    } else if ($_POST["level"] == 2) {
+        mysqli_query($conn, "UPDATE players set levelTwoScore = " . $_POST["score"] . " WHERE playerId = " . '"' . $_POST["playerId"] . '"');
+        mysqli_close($conn);
+    } else if ($_POST["level"] == 3) {
+        mysqli_query($conn, "UPDATE players set levelThreeScore = " . $_POST["score"] . " WHERE playerId = " . '"' . $_POST["playerId"] . '"');
+        mysqli_close($conn);
+    }
+}
