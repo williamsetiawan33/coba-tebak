@@ -22,7 +22,7 @@ header('Content-Type: application/json; charset=utf-8');
 // header("Access-Control-Allow-Methods: POST");
 
 // api mode selection
-$mode = "dev";
+$mode = "release";
 
 if ($mode == "dev") {
     // echo "<script>console.log('developer mode active')</script>";
