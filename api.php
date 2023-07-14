@@ -22,7 +22,7 @@ header('Content-Type: application/json; charset=utf-8');
 // header("Access-Control-Allow-Methods: POST");
 
 // api mode selection
-$mode = "release";
+$mode = "dev";
 
 if ($mode == "dev") {
     // echo "<script>console.log('developer mode active')</script>";
@@ -281,7 +281,7 @@ if (isset($_POST["submit"]) && isset($_POST["name"]) && isset($_POST["signUp"]))
     // if true then insert into db and give succes message, if not then give already-used message
     if ($isExist == false) {
         $query = mysqli_query($conn, "INSERT INTO players VALUES(" . '"' . $randomPlayerId . '"' . ',' . '"' . $_POST["name"] . '"' . ',' . '"' . $randomPlayerAccess . '"' . ',0,0,0)');
-        mysqli_close($conn);
+        // mysqli_close($conn);
         echo '{"message": "succes", "accessCode":' . '"' . $randomPlayerAccess . '"' . '}';
     } else if ($isExist == true) {
         echo '{"message": "already-used"}';
